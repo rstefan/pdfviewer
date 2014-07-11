@@ -223,8 +223,6 @@
         }
 
         // private methods
-        // these methods can be called only from inside the plugin like:
-        // methodName(arg1, arg2, ... argn)
         var build = function() {
             return plugin.settings.toolbar_template + plugin.settings.viewer_template;
         }
@@ -241,23 +239,15 @@
             }
         }
 
-
-        // fire up the plugin!
-        // call the "constructor" method
         plugin.init();
     }
 
-    // add the plugin to the jQuery.fn object
     $.fn.pdfviewer = function(options) {
 
-        // iterate through the DOM elements we are attaching the plugin to
         return this.each(function() {
 
-            // if plugin has not already been attached to the element
             if (undefined == $(this).data('pdfviewer')) {
 
-                // create a new instance of the plugin
-                // pass the DOM element and the user-provided options as arguments
                 var plugin = new $.pdfviewer(this, options);
 
                 // in the jQuery version of the element
