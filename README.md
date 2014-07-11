@@ -1,6 +1,6 @@
 # pdfviewer : a very simple PDF viewer for jQuery
 
-based on [PDF.js](http://mozilla.github.io/pdf.js/) and inspired [this example](http://jsbin.com/pdfjs-prevnext-v2/6865/edit#html,live)
+based on [PDF.js](http://mozilla.github.io/pdf.js/) and inspired by [this example](http://jsbin.com/pdfjs-prevnext-v2/6865/edit#html,live)
 
 ## Installation
 
