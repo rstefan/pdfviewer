@@ -152,12 +152,42 @@
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
 
-
                 $('.pdf-canvas').css('margin-top', $('.pdf-toolbar').height() + 1);
                 if (canvas.width < $(canvas).parent().width() - 20)
                     $(canvas).css('margin-left', (($(canvas).parent().width() - canvas.width) / 2));
                 else
                     $(canvas).css('margin-left', 0);
+
+
+                // now default all the dimension info
+                // finally query the various pixel ratios
+                var devicePixelRatio = window.devicePixelRatio || 1,
+                    backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
+                    ctx.mozBackingStorePixelRatio ||
+                    ctx.msBackingStorePixelRatio ||
+                    ctx.oBackingStorePixelRatio ||
+                    ctx.backingStorePixelRatio || 1,
+
+                    ratio = devicePixelRatio / backingStoreRatio;
+
+                // upscale the canvas if the two ratios don't match
+                if (devicePixelRatio !== backingStoreRatio) {
+
+                    var oldWidth = canvas.width;
+                    var oldHeight = canvas.height;
+
+                    canvas.width = oldWidth * ratio;
+                    canvas.height = oldHeight * ratio;
+
+                    canvas.style.width = oldWidth + 'px';
+                    canvas.style.height = oldHeight + 'px';
+
+                    // now scale the context to counter
+                    // the fact that we've manually scaled
+                    // our canvas element
+                    ctx.scale(ratio, ratio);
+
+                }
 
                 // Render PDF page into canvas context
                 var renderContext = {
