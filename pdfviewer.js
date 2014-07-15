@@ -17,6 +17,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+(function($) {
+
+    var customStyle = {
+        width: '100px',
+        height: '100px',
+        overflow: 'scroll',
+        position: 'absolute',
+        top: '-9999px'
+    };
+
+    var $scrollDiv = $("<div>").css(customStyle);
+    var scrollDiv = $scrollDiv.get(0);
+    $("body").append($scrollDiv);
+
+    var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+    var scrollbarHeight = scrollDiv.offsetHeight - scrollDiv.clientHeight;
+    document.body.removeChild(scrollDiv);
+
+    $.scrollbar = {
+        width: function() {
+            return scrollbarWidth;
+        },
+
+        height: function() {
+            return scrollbarHeight;
+        }
+    };
+})(jQuery);
+
 
 (function($) {
     $.pdfviewer = function(element, options) {
@@ -122,10 +151,13 @@
                 var viewport = page.getViewport(scale);
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
+
+
+                $('.pdf-canvas').css('margin-top', $('.pdf-toolbar').height() + 1);
                 if (canvas.width < $(canvas).parent().width() - 20)
-                    $(canvas).css('left', (($(canvas).parent().width() - canvas.width) / 2));
+                    $(canvas).css('margin-left', (($(canvas).parent().width() - canvas.width) / 2));
                 else
-                    $(canvas).css('left', 0);
+                    $(canvas).css('margin-left', 0);
 
                 // Render PDF page into canvas context
                 var renderContext = {
@@ -142,7 +174,7 @@
 
                     if (pageNumPending !== null) {
                         // New page rendering is pending
-                        renderPage(pageNumPending);
+                        plugin.renderPage(pageNumPending);
                         pageNumPending = null;
                     }
                 });
@@ -188,8 +220,8 @@
 
         plugin.autoFit = function() {
             pdfDoc.getPage(pageNum).then(function(page) {
-                var parentHeight = $(canvas).parent().height() - 5;
-                var parentWidth = $(canvas).parent().width() - 20;
+                var parentHeight = $(canvas).parent().height();
+                var parentWidth = $(canvas).parent().width();
                 var viewport = page.getViewport(1.0);
 
                 if (parentHeight <= parentWidth)
@@ -202,10 +234,14 @@
 
         plugin.autoFitScaleByHeight = function() {
             pdfDoc.getPage(pageNum).then(function(page) {
-                var parentHeight = $(canvas).parent().height() - 5;
+                var parentHeight = $(canvas).parent().height() - 1;
+                var parentWidth = $(canvas).parent().width() - 1;
 
                 var viewport = page.getViewport(1.0);
                 scale = parentHeight / viewport.height;
+
+                if (scale * viewport.width >= parentWidth)
+                    scale = (parentHeight - $.scrollbar.height()) / viewport.height;
 
                 queueRenderPage(pageNum);
             });
@@ -213,10 +249,14 @@
 
         plugin.autoFitScaleByWidth = function() {
             pdfDoc.getPage(pageNum).then(function(page) {
-                var parentWidth = $(canvas).parent().width() - 20;
+                var parentWidth = $(canvas).parent().width() - 1;
+                var parentHeight = $(canvas).parent().height() - 1;
 
                 var viewport = page.getViewport(1.0);
                 scale = parentWidth / viewport.width;
+
+                if (scale * viewport.height >= parentHeight)
+                    scale = (parentWidth - $.scrollbar.width()) / viewport.width;
 
                 queueRenderPage(pageNum);
             });

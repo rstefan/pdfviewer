@@ -39,7 +39,7 @@
 .pdf-toolbar
 {
 	background-color: #cccccc;
-	position: absolute;
+	position: relative;
 	top: 0;
 	z-index: 100;
 	width: 100%;
@@ -51,8 +51,8 @@
 
 .pdf-container .pdf-canvas {
 	position: absolute;
-
-	top: 40px;
+	margin-top: 40px;
+	top: 0;
 	bottom: 0px;
 	left: 0;
 	right: 0;
@@ -62,3 +62,16 @@
 	position: relative;
 	display: inline-block;
 }
+
+/*
+.pdf-container {
+	margin-left: auto;
+	margin-right: auto;
+	width: 80%;	
+
+	background-color: #aaaaaa;
+	border: solid 1px #111111;
+	overflow: hidden;
+
+}
+*/

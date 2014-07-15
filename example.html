@@ -23,6 +23,7 @@
 <html>
 <head>
 	<link rel="stylesheet" type="text/css" href="pdfviewer.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 	<div class="pdf-container" data-href="http://cdn.mozilla.net/pdfjs/tracemonkey.pdf"></div>
@@ -38,6 +39,7 @@
 				scale: 2,
 				onDocumentLoaded: function() {
 					var num = $(this).data('pdfviewer').pages();
+					$(this).data('pdfviewer').autoFit();
 					//alert('onDocumentLoaded:'+num);		
 				},
 	            onPrevPage: function() { 
