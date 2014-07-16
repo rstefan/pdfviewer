@@ -108,6 +108,13 @@
                 return this;
             }
 
+            PDFJS.workerSrc = (function() {
+                'use strict';
+                var scriptTagContainer = document.body ||
+                    document.getElementsByTagName('head')[0];
+                var pdfjsSrc = $("script[src*='pdf.js']").get(0).src;
+                return pdfjsSrc && pdfjsSrc.replace(/(\.js$)|(\.js(\?.*))$/i, '.worker.js$3');
+            })();
             PDFJS.disableWorker = true;
 
             scale = plugin.settings.scale;
