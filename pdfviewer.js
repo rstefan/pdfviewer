@@ -46,6 +46,41 @@
     };
 })(jQuery);
 
+(function($) {
+    /*
+     * loads JS Script on demand
+     *  -> thx to Chris' answer at http://stackoverflow.com/questions/7716280/auto-load-include-for-javascript
+     */
+    var js_loader = {
+        assets: {},
+        include: function(asset_name, callback) {
+            if (typeof callback != 'function')
+                callback = function() {
+                    return false;
+                };
+
+            if (typeof this.assets[asset_name] != 'undefined')
+                return callback();
+
+
+            var html_doc = document.getElementsByTagName('head')[0];
+            var st = document.createElement('script');
+            st.setAttribute('language', 'javascript');
+            st.setAttribute('type', 'text/javascript');
+            st.setAttribute('src', asset_name);
+            st.onload = function() {
+                js_loader._script_loaded(asset_name, callback);
+            };
+            html_doc.appendChild(st);
+        },
+        _script_loaded: function(asset_name, callback) {
+            this.assets[asset_name] = true;
+            callback();
+        }
+    };
+
+    $.js_loader = js_loader;
+})(jQuery);
 
 (function($) {
     $.pdfviewer = function(element, options) {
@@ -94,20 +129,7 @@
             canvas = null,
             ctx = null;
 
-        plugin.init = function() {
-
-            options = options || {};
-            options.href = options.href || $element.data('href');
-
-            plugin.settings = $.extend({}, defaults, options);
-
-            $element.html(build());
-
-            if (!PDFJS) {
-                console.log('pdf.js not loaded. Add "pdf.js" to your page.');
-                return this;
-            }
-
+        var initialize = function() {
             PDFJS.workerSrc = (function() {
                 'use strict';
                 var scriptTagContainer = document.body ||
@@ -115,6 +137,7 @@
                 var pdfjsSrc = $("script[src*='pdf.js']").get(0).src;
                 return pdfjsSrc && pdfjsSrc.replace(/(\.js$)|(\.js(\?.*))$/i, '.worker.js$3');
             })();
+
             PDFJS.disableWorker = true;
 
             scale = plugin.settings.scale;
@@ -140,6 +163,31 @@
                 // Initial/first page rendering
                 plugin.renderPage(pageNum);
             });
+
+        }
+
+        plugin.init = function() {
+
+            options = options || {};
+            options.href = options.href || $element.data('href');
+
+            plugin.settings = $.extend({}, defaults, options);
+
+            $element.html(build());
+
+            if ('undefined' != typeof PDFJS) {
+                initialize();
+            } else {
+                console.log('pdf.js not loaded. Try to dynamicly load "pdf.js" to your page.');
+
+                var scriptTagContainer = document.body || document.getElementsByTagName('head')[0];
+                var pdfjsSrc = $("script[src*='pdfviewer.js']").get(0).src;
+                pdfjsSrc = pdfjsSrc.replace(/(pdfviewer\.js$)|(pdfviewer\.js(\?.*))$/i, 'pdfjs-dist/build/pdf.js$3');
+
+                $.js_loader.include(pdfjsSrc, initialize);
+
+                return plugin;
+            }
         };
 
 
